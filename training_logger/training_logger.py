@@ -8,7 +8,7 @@ from collections import Iterable
 
 class TrainingLogger:
     DATATYPES = set({"scalar", "img"})
-    def __init__(self, basename):
+    def __init__(self, basename, overwrite=False):
         self.basename = basename
         try:
             self.data = pd.read_csv(os.path.join(basename, "data.csv"), index_col=0)
@@ -23,8 +23,7 @@ class TrainingLogger:
             try:
                 os.makedirs(basename)
             except FileExistsError:
-                inp = input(f"The directory {basename} already exists. Delete existing? [y/N] ")
-                if inp.lower() in ("y", "yes", "j", "ja"):
+                if overwrite or input(f"The directory {basename} already exists. Delete existing? [y/N] ").lower() in ("y", "yes", "j", "ja"):
                     shutil.rmtree(basename)
                     os.makedirs(basename)
                 else:
