@@ -13,6 +13,11 @@ class TrainingLogger:
         self.basename = basename
         try:
             self.data = pd.read_csv(os.path.join(basename, "data.csv"), index_col=0)
+            if not overwrite:
+                q = input(f"The directory {basename} already exists. Continue (this may overwrite old data)? [y/N] ").lower()
+                if q not in ("y", "yes", "j", "ja"):
+                    print("Exiting due to existing file")
+                    sys.exit(-1)
             with open(os.path.join(basename, "data.meta"), "r") as f:
                 json_str = f.read().replace("'", "\"")
                 self.metadata = dict(json.loads(json_str))
@@ -84,7 +89,7 @@ class LogVisualizer:
     
     def update_data(self):
         try:
-            self.logger = TrainingLogger(self.logger.basename)
+            self.logger = TrainingLogger(self.logger.basename, overwrite=True)
         except Exception as e:
             print("Could not update...")
             print(str(e))
