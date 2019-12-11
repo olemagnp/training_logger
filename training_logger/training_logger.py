@@ -23,7 +23,10 @@ class TrainingLogger:
             try:
                 os.makedirs(basename)
             except FileExistsError:
-                if overwrite or input(f"The directory {basename} already exists. Delete existing? [y/N] ").lower() in ("y", "yes", "j", "ja"):
+                if not overwrite:
+                    q = input(f"The directory {basename} already exists. Delete existing? [y/N] ").lower()
+                    overwrite = q in ("y", "yes", "j", "ja")
+                if overwrite:
                     shutil.rmtree(basename)
                     os.makedirs(basename)
                 else:
@@ -118,6 +121,12 @@ class LogVisualizer:
         axes.imshow(a)
         i.close()
         return axes
+    
+    def show_scalars(self, names, subplots=True, axes=None, **kwargs):
+        for name in names:
+            axes = self.show_graph(name, axes, **kwargs)
+            if subplots:
+                axes = None
     
     def show_all_scalars(self, subplots=True, axes=None, **kwargs):
         for k, v in self.logger.metadata.items():
