@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import os, sys, shutil
 import json
+import re
 from PIL import Image
 from matplotlib import pyplot as plt
 from collections import Iterable
@@ -121,6 +122,16 @@ class LogVisualizer:
         axes.imshow(a)
         i.close()
         return axes
+    
+    def show_matching_scalars(self, expr, axes=None, **kwargs):
+        if not isinstance(expr, Iterable):
+            expr = [expr]
+        for ex in expr:
+            names = []
+            for col_name in self.get_cols():
+                if re.fullmatch(ex, col_name):
+                    names.append(col_name)
+            self.show_scalars(names, False, axes, **kwargs)
     
     def show_scalars(self, names, subplots=True, axes=None, **kwargs):
         for name in names:
