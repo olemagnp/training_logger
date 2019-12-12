@@ -12,7 +12,7 @@ class LogVisualizer:
     
     def __init__(self, path, prefix=''):
         """
-        Create a new LogVisualizer
+        Create a new :class:`LogVisualizer`
         
         :param path: The path of the directory containing the run log and metadata
         :param prefix: Prefix to add to labels when plotting. This is useful when plotting data from more than one source on the same axes object
@@ -41,9 +41,9 @@ class LogVisualizer:
         :param axes: The axes object to plot on. If None, a new figure is created and it's axes used.
         :param ylim: Y-limit of the plot
         :param xlim: X-limit of the plot
-        :param kwargs: Keyword-arguments passed to `axes.plot(...)`. Should not contain label.
-        :returns: `matplotlib.pyplot.Axes` object, the one used to draw the plot.
-        :raises: AssertionError if name is not a scalar column
+        :param kwargs: Keyword-arguments passed to :meth:`Axes.plot()<matplotlib.axes.Axes.plot>`. Should not contain label.
+        :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
+        :raises: :exc:`AssertionError` if name is not a scalar column
         """
         assert name in self.logger.data.columns
         assert self.logger.metadata[name] == 'scalar'
@@ -67,9 +67,9 @@ class LogVisualizer:
         :param name: The name of the column to plot the image from. This must be an image column.
         :param iteration: The iteration to show the image from.
         :param axes: The axes object to draw on. If None, a new figure is created and it's axes used.
-        :returns: `matplotlib.pyplot.Axes` object, the one used to draw the image.
-        :raises: AssertionError if name is not an image column
-        :raises: FileNotFoundError if the image has been moved or removed from the training directory
+        :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the image.
+        :raises: :exc:`AssertionError` if name is not an image column
+        :raises: :exc:`FileNotFoundError` if the image has been moved or removed from the training directory
         """
         assert name in self.logger.data.columns
         assert self.logger.metadata[name] == 'img'
@@ -100,10 +100,10 @@ class LogVisualizer:
         are plotted in different axes. If only one expression is given, all columns
         are plotted in the same axes.
         
-        :param expr: String or list of strings, the expression(s) to match agains. Should follow standard Python `re` syntax.
+        :param expr: String or list of strings, the expression(s) to match agains. Should follow standard Python :mod:`re` syntax.
         :param axes: The axes to plot. If not None, all values are plotted in this one. Otherwise, see the description above.
-        :param kwargs: Keyword-arguments passed to `LogVisualizer.show_scalars`
-        :returns: `matplotlib.pyplot.Axes` object, the one used to draw the plot.
+        :param kwargs: Keyword-arguments passed to :func: :meth:`~LogVisualizer.show_scalars`.
+        :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         """
         if not isinstance(expr, Iterable):
             expr = [expr]
@@ -119,14 +119,14 @@ class LogVisualizer:
         """
         Method to show multiple scalars.
         
-        This method simply calls `LogVisualizer.show_graph` for all names,
+        This method simply calls :meth:`~LogVisualizer.show_graph` for all names,
         as well as some handling of the axes objects.
         
         :param names: Iterable of column names. Each must be a scalar column.
         :param subplots: If true, each column is plotted on its own axis. Otherwise, they are plotted on the same.
-        :param axes: The `matplotlib.pyplot.Axes` object used to plot the (first) data series
-        :param kwargs: Keyword-arguments passed to `LogVisualizer.show_graph`
-        :returns: `matplotlib.pyplot.Axes` object, the one used to draw the plot.
+        :param axes: The :class:`~matplotlib.axes.Axes` object used to plot the (first) data series
+        :param kwargs: Keyword-arguments passed to :meth:`~LogVisualizer.show_graph`
+        :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         """
         for name in names:
             axes = self.show_graph(name, axes, **kwargs)
@@ -139,9 +139,9 @@ class LogVisualizer:
         Method for showing all available scalars.
         
         :param subplots: If True, each column is plotted on its own axis. Otherwise, they are plotted on the same.
-        :param axes: The `matplotlib.pyplot.Axes` object used to plot the (first) data series
-        :param kwargs: Keyword-arguments passed to `LogVisualizer.show_graph()`
-        :returns: `matplotlib.pyplot.Axes` object, the one used to draw the plot.
+        :param axes: The :class:`~matplotlib.axes.Axes` object used to plot the (first) data series
+        :param kwargs: Keyword-arguments passed to :meth:`~LogVisualizer.show_graph()`
+        :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         """
         for k, v in self.logger.metadata.items():
             if v == 'scalar':
@@ -157,7 +157,7 @@ class LogVisualizer:
     
     def get_non_null_index(self, col):
         """
-        Get all indices where the value for the column `col` is not null/na.
+        Get all indices where the value for the column :code:`col` is not null/na.
         
         :returns: A list of the non-null indices for column col
         """
@@ -167,7 +167,7 @@ class MultiLogVisualizer:
     """
     Class for comparing the training progress of multiple runs.
     
-    Wraps an arbitrary number of `LogVisualizer`s
+    Wraps an arbitrary number of :class:`LogVisualizer`
     """
     
     def __init__(self, *paths):
@@ -191,7 +191,7 @@ class MultiLogVisualizer:
         Instead, use one of the higher-level methods which calls show_graph on
         the internal visualizers.
         """
-        raise NotImplemented()
+        raise NotImplementedError()
     
     def show_img(self, name, iteration, axes=None):
         """
@@ -222,10 +222,10 @@ class MultiLogVisualizer:
         Dataseries from the same expression from all visualizers are plotted in the same axes object.
         Dataseries from different expressions are plotted in different axes.
         
-        :param expr: String or list of strings, the expression(s) to match agains. Should follow standard Python `re` syntax.
-        :param axes: The axes to plot the first expression in.
+        :param expr: String or list of strings, the expression(s) to match agains. Should follow standard Python :mod:`re` syntax.
+        :param axes: The :class:`~matplotlib.axes.Axes` to plot the first expression in.
         :param kwargs: Keyword-arguments passed to the show_graph method of internal visualizers.
-        :returns: `matplotlib.pyplot.Axes` object, the one used to draw the final dataseries.
+        :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the final dataseries.
         """
         if not isinstance(expr, Iterable):
             expr = [expr]
@@ -248,15 +248,15 @@ class MultiLogVisualizer:
         """
         Method to show multiple scalars.
         
-        This method simply calls `LogVisualizer.show_graph` for all combination of names and internal visualizers,
+        This method simply calls :meth:`LogVisualizer.show_graph` for all combination of names and internal visualizers,
         as well as some handling of the axes objects.
         
         :param names: Iterable of column names. Each must be a scalar column.
         :param subplots: If true, each column is plotted on its own axis. The same column from different visualizers are plotted together. 
                         If false, all columns are plotted together.
-        :param axes: The `matplotlib.pyplot.Axes` object used to plot the (first) data series
-        :param kwargs: Keyword-arguments passed to `LogVisualizer.show_graph`
-        :returns: `matplotlib.pyplot.Axes` object, the one used to draw the plot.
+        :param axes: The :class:`~matplotlib.axes.Axes` object used to plot the (first) data series
+        :param kwargs: Keyword-arguments passed to :meth:`LogVisualizer.show_graph`
+        :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         """
         for name in names:
             for viz in self.visualizers:
@@ -273,9 +273,9 @@ class MultiLogVisualizer:
         
         :param subplots: If true, each column is plotted on its own axis. The same column from different visualizers are plotted together. 
                         If false, all columns are plotted together.
-        :param axes: The `matplotlib.pyplot.Axes` object used to plot the (first) data series
-        :param kwargs: Keyword-arguments passed to `LogVisualizer.show_graph()`
-        :returns: `matplotlib.pyplot.Axes` object, the one used to draw the plot.
+        :param axes: The :class:`~matplotlib.axes.Axes` object used to plot the (first) data series
+        :param kwargs: Keyword-arguments passed to :meth:`LogVisualizer.show_graph()`
+        :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         """
         md = self.visualizers[0].metadata
         for viz in self.visualizers[1:]:
@@ -293,7 +293,7 @@ class MultiLogVisualizer:
     
     def show_category_scalars(self, category, *args, single_axis = True, **kwargs):
         orig_axes = kwargs.pop('axes', None)
-        return self.show_matching_scalars(f"{category}/", orig_axis, **kwarg)
+        return self.show_matching_scalars(f"{category}/", orig_axes, **kwargs)
     
     def get_cols(self):
         """
@@ -303,7 +303,7 @@ class MultiLogVisualizer:
     
     def get_non_null_index(self, col):
         """
-        Get all indices where the value for the column `col` is not null/na.
+        Get all indices where the value for the column :code:`col` is not null/na.
         
         :returns: A list of list of the non-null indices for column col. Each internal list corresponds to the visualizer at the same position.
         """

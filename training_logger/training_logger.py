@@ -18,17 +18,17 @@ class TrainingLogger:
     
     def __init__(self, basename, overwrite=False):
         """
-        Create a new logger, which logs to `basename`.
+        Create a new logger, which logs to :code:`basename`.
         
         The logger can either work with existing logs. If so, the user will be asked to 
         confirm, as this could possibly overwrite existing data. You can circumwent this
-        check by passing `overwrite=True` to the initializer.
+        check by passing :code:`overwrite=True` to the initializer.
         
         The initializer further makes sure the logdir exists, and initializes the internal
         dataframe and metadata dict.
         
         :param basename: The directory to save logs, metadata, and images to.
-        :param overwrite: If true, no check is made to confirm that you wish to work with existing logs.
+        :param overwrite: If :code:`True`, no check is made to confirm that you wish to work with existing logs.
         """
         self.basename = basename
         try:
@@ -65,8 +65,8 @@ class TrainingLogger:
         """
         Save the content of the logger.
         
-        The method always saves the dataframe to a csv at `<basename>/data.csv`,
-        but only saves the metadata to `<basename>/data.meta` if the metadata
+        The method always saves the dataframe to a csv at :nocode:`<basename>/data.csv`,
+        but only saves the metadata to :nocode:`<basename>/data.meta` if the metadata
         has changed (i.e. if a new column has been added).
         """
         self.data.to_csv(os.path.join(self.basename, "data.csv"))
@@ -88,7 +88,7 @@ class TrainingLogger:
         :param value: Scalar value to add. Note that this should be a number, not a Tensor or Array, 
                     for it to work properly with the visualization. However, no check is made against
                     this, meaning you are free to save whatever you wish.
-        :param iteration: Iteration to save this image to. Used for displaying the data. If None, iteration = len(self.data.index)
+        :param iteration: Iteration to save this image to. Used for displaying the data. If None, :code:`iteration = len(self.data.index)`
         """
         if name not in self.data.columns:
             self.data[name] = None
@@ -112,8 +112,8 @@ class TrainingLogger:
         The method saves the data to file after adding.
         
         :param name: Name of the value, used to group and display the data.
-        :param value: Image to be added. This should be in the form of a numpy array (or similar). Type can be either float32 (with values 0-1) or uint8 (with values 0-256).
-        :param iteration: Iteration to save this image to. Used for displaying the data. If None, iteration = len(self.data.index)
+        :param value: Image to be added. This should be in the form of a :class:`numpy.ndarray` or similar. Type can be either :obj:`numpy.float32` (with values in the range :math:`[0, 1)` ) or :obj:`numpy.uint8` (with values in the range :math:`[0,256]` ).
+        :param iteration: Iteration to save this image to. Used for displaying the data. If :code:`None`, :code:`iteration = len(self.data.index)`
         """
         if name not in self.data.columns:
             self.data[name] = None
