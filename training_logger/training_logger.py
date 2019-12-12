@@ -2,14 +2,34 @@ import pandas as pd
 import numpy as np
 import os, sys, shutil
 import json
-import re
 from PIL import Image
-from matplotlib import pyplot as plt
-from collections import Iterable
 
 class TrainingLogger:
+    """
+    Class for logging the training of neural networks.
+    
+    The class is a simple wrapper around a pandas dataframe and a json-file.
+    Data is saved in the dataframe, and saved as a CSV-file to disk.
+    Metadata is saved in the json-file.
+    Images are saved in the root folder
+    """
+    
     DATATYPES = set({"scalar", "img"})
+    
     def __init__(self, basename, overwrite=False):
+        """
+        Create a new logger, which logs to `basename`.
+        
+        The logger can either work with existing logs. If so, the user will be asked to 
+        confirm, as this could possibly overwrite existing data. You can circumwent this
+        check by passing `overwrite=True` to the initializer.
+        
+        The initializer further makes sure the logdir exists, and initializes the internal
+        dataframe and metadata dict.
+        
+        :param basename: The directory to save logs, metadata, and images to.
+        :param overwrite: If true, no check is made to confirm that you wish to work with existing logs.
+        """
         self.basename = basename
         try:
             self.data = pd.read_csv(os.path.join(basename, "data.csv"), index_col=0)
@@ -42,6 +62,13 @@ class TrainingLogger:
         self.meta_changed = False
     
     def save(self):
+        """
+        Save the content of the logger.
+        
+        The method always saves the dataframe to a csv at `<basename>/data.csv`,
+        but only saves the metadata to `<basename>/data.meta` if the metadata
+        has changed (i.e. if a new column has been added).
+        """
         self.data.to_csv(os.path.join(self.basename, "data.csv"))
         if self.meta_changed:
             with open(os.path.join(self.basename, "data.meta"), "w") as f:
@@ -49,6 +76,20 @@ class TrainingLogger:
             self.meta_changed = False
     
     def add_scalar(self, name, value, iteration=None):
+        """
+        Add a scalar value to the log.
+        
+        If the given scalar name does not exist yet, a new
+        column is added to the dataframe and metadata.
+        
+        The method saves the data to file after adding.
+        
+        :param name: Name of the value, used to group and display the data.
+        :param value: Scalar value to add. Note that this should be a number, not a Tensor or Array, 
+                    for it to work properly with the visualization. However, no check is made against
+                    this, meaning you are free to save whatever you wish.
+        :param iteration: Iteration to save this image to. Used for displaying the data. If None, iteration = len(self.data.index)
+        """
         if name not in self.data.columns:
             self.data[name] = None
             self.metadata[name] = "scalar"
@@ -62,6 +103,18 @@ class TrainingLogger:
         self.save()
     
     def add_image(self, name, value, iteration=None):
+        """
+        Add an image to the log.
+        
+        If the given image name does not exist yet, a new
+        column is added to the dataframe and metadata.
+        
+        The method saves the data to file after adding.
+        
+        :param name: Name of the value, used to group and display the data.
+        :param value: Image to be added. This should be in the form of a numpy array (or similar). Type can be either float32 (with values 0-1) or uint8 (with values 0-256).
+        :param iteration: Iteration to save this image to. Used for displaying the data. If None, iteration = len(self.data.index)
+        """
         if name not in self.data.columns:
             self.data[name] = None
             self.metadata[name] = "img"
@@ -83,86 +136,3 @@ class TrainingLogger:
         self.save()
 
 
-class LogVisualizer:
-    def __init__(self, logger):
-        self.logger = logger
-    
-    def update_data(self):
-        try:
-            self.logger = TrainingLogger(self.logger.basename, overwrite=True)
-        except Exception as e:
-            print("Could not update...")
-            print(str(e))
-    
-    def show_graph(self, name, axes=None, ylim=None, xlim=None, **kwargs):
-        assert name in self.logger.data.columns
-        assert self.logger.metadata[name] == 'scalar'
-        plt_data = self.logger.data[name].dropna()
-        if axes is None:
-            axes = plt.figure().gca()
-        axes.plot(plt_data.index.values, plt_data.values, label=name)
-        axes.legend()
-        if ylim is not None:
-            axes.set_ylim(ylim)
-        if xlim is not None and isinstance(xlim, Iterable):
-            axes.set_xlim(xlim)
-        elif xlim is not None:
-            axes.set_xlim((xlim, self.logger.data.index.max()))
-        return axes
-    
-    def show_img(self, name, iteration, axes=None):
-        assert name in self.logger.data.columns
-        assert self.logger.metadata[name] == 'img'
-
-        if axes is None:
-            fig = plt.figure(figsize=(30,6))
-            
-            axes = plt.axes()
-        
-        path = self.logger.data.loc[iteration, name]
-        assert path is not None
-        i = Image.open(path)
-        a = np.asarray(i)
-
-        axes.imshow(a)
-        i.close()
-        return axes
-    
-    def show_matching_scalars(self, expr, axes=None, **kwargs):
-        if not isinstance(expr, Iterable):
-            expr = [expr]
-        for ex in expr:
-            names = []
-            for col_name in self.get_cols():
-                if re.fullmatch(ex, col_name):
-                    names.append(col_name)
-            self.show_scalars(names, False, axes, **kwargs)
-    
-    def show_scalars(self, names, subplots=True, axes=None, **kwargs):
-        for name in names:
-            axes = self.show_graph(name, axes, **kwargs)
-            if subplots:
-                axes = None
-    
-    def show_all_scalars(self, subplots=True, axes=None, **kwargs):
-        for k, v in self.logger.metadata.items():
-            if v == 'scalar':
-                axes = self.show_graph(k, axes, **kwargs)
-                if subplots:
-                    axes = None
-    
-    def show_category_scalars(self, category, *args, single_axis = True, **kwargs):
-        orig_axes = kwargs.pop('axes', None)
-        axes = orig_axes
-        for col in self.get_cols():
-            if str(col).startswith(category):
-                if not single_axis and orig_axes is None:
-                    axes = None
-                axes = self.show_graph(str(col), axes, *args, **kwargs)
-        return axes
-    
-    def get_cols(self):
-        return list(self.logger.data.columns)
-    
-    def get_non_null_index(self, col):
-        return list(self.logger.data[col].dropna().index)
