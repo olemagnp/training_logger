@@ -32,6 +32,18 @@ class LogVisualizer:
         except Exception as e:
             print("Could not update...")
             print(str(e))
+        
+    def smooth_data(self, data, window_size, sigma):
+        window = np.arange(-(window_size // 2), window_size // 2 + 1)
+        window = 1 / (sigma * np.sqrt(2 * np.pi)) * np.exp(- 1 / 2 * (window / sigma) ** 2)
+        window /= np.sum(window)
+
+        to_conv = np.zeros((data.shape[0] + window_size - 1))
+        to_conv[window_size // 2:-(window_size // 2)] = data
+        to_conv[:window_size // 2] = data[0]
+        to_conv[-window_size // 2:] = data[-1]
+
+        return np.convolve(to_conv, window, mode='valid')
     
     def show_graph(self, name, axes=None, ylim=None, xlim=None, smooth_window=0, smooth_sigma=3, **kwargs):
         """
@@ -56,14 +68,7 @@ class LogVisualizer:
         y = plt_data.values
 
         if smooth_window > 0:
-            window = np.arange(-smooth_window // 2, smooth_window // 2 + 1)
-            window = 1 / (smooth_sigma * np.sqrt(2 * np.pi)) * np.exp(- 1 / 2 * (window / smooth_sigma) ** 2)
-            window /= np.sum(window)
-            to_conv = np.zeros((y.shape[0] + smooth_window - 1))
-            to_conv[smooth_window // 2:-(smooth_window // 2)] = y
-            to_conv[:smooth_window // 2] = y[0]
-            to_conv[-smooth_window // 2:] = y[-1]
-            y = np.convolve(to_conv, window, mode='valid')
+            y = self.smooth_data(y, smooth_window, smooth_sigma)
 
         if axes is None:
             axes = plt.figure().gca()
