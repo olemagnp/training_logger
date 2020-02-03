@@ -38,8 +38,7 @@ setup(
         'pandas',
         'matplotlib'
     ),
-    extras_require=(
-        'sphinx',
-        'sphinx_rtd_theme'
-    )
+    extras_require={
+        'documentation': ['sphinx', 'sphinx_rtd_theme']
+    }
 )
