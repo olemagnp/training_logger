@@ -59,7 +59,11 @@ class LogVisualizer:
             window = np.arange(-smooth_window // 2, smooth_window // 2 + 1)
             window = 1 / (smooth_sigma * np.sqrt(2 * np.pi)) * np.exp(- 1 / 2 * (window / smooth_sigma) ** 2)
             window /= np.sum(window)
-            y = np.convolve(y, window, mode='same')
+            to_conv = np.zeros((y.shape[0] + smooth_window - 1))
+            to_conv[smooth_window // 2:-smooth_window // 2] = y
+            to_conv[:smooth_window // 2] = y[0]
+            to_conv[-smooth_window // 2:] = y[-1]
+            y = np.convolve(to_conv, window, mode='valid')
 
         if axes is None:
             axes = plt.figure().gca()
