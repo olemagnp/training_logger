@@ -1,4 +1,4 @@
-H1: Visualizers
+Visualizers
 ==================
 .. role:: nocode(code)
         :language:
