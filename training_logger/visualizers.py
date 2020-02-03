@@ -33,7 +33,7 @@ class LogVisualizer:
             print("Could not update...")
             print(str(e))
     
-    def show_graph(self, name, axes=None, ylim=None, xlim=None, smooth_window=0, **kwargs):
+    def show_graph(self, name, axes=None, ylim=None, xlim=None, smooth_window=0, smooth_sigma=3, **kwargs):
         """
         Base method to plot a scalar value.
         
@@ -56,8 +56,10 @@ class LogVisualizer:
         y = plt_data.values
 
         if smooth_window > 0:
-            window = np.ones(smooth_window) / float(smooth_window)
-            y = np.convolve(y, window)
+            window = np.arange(-smooth_window // 2, smooth_window // 2 + 1)
+            window = 1 / (smooth_sigma * np.sqrt(2 * np.pi)) * np.exp(- 1 / 2 * (window / smooth_sigma) ** 2)
+            window /= np.sum(window)
+            y = np.convolve(y, window, mode='same')
 
         if axes is None:
             axes = plt.figure().gca()
