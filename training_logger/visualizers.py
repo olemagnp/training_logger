@@ -33,7 +33,7 @@ class LogVisualizer:
             print("Could not update...")
             print(str(e))
     
-    def show_graph(self, name, axes=None, ylim=None, xlim=None, **kwargs):
+    def show_graph(self, name, axes=None, ylim=None, xlim=None, smooth_window=0, **kwargs):
         """
         Base method to plot a scalar value.
         
@@ -41,6 +41,9 @@ class LogVisualizer:
         :param axes: The axes object to plot on. If None, a new figure is created and it's axes used.
         :param ylim: Y-limit of the plot
         :param xlim: X-limit of the plot
+        :param smooth_window: Window to average for smoothing the plot. If 0, no smoothing is performed, otherwise
+                    the data is smoothed as :math:`\\hat{x}[i] = \\frac{\\sum_{j = -\\left\\lfloor s/2 \\right\\rfloor}^{\\left\\lfloor s/2 \\right\\rfloor} x[i + j]}{s}`, where :math:`s`
+                    is the smoothing window.
         :param kwargs: Keyword-arguments passed to :meth:`Axes.plot()<matplotlib.axes.Axes.plot>`. Should not contain label.
         :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         :raises: :exc:`AssertionError` if name is not a scalar column
@@ -48,9 +51,17 @@ class LogVisualizer:
         assert name in self.logger.data.columns
         assert self.logger.metadata[name] == 'scalar'
         plt_data = self.logger.data[name].dropna()
+
+        x = plt_data.index.values
+        y = plt_data.values
+
+        if smooth_window > 0:
+            window = np.ones(smooth_window) / float(smooth_window)
+            y = np.convolve(y, window)
+
         if axes is None:
             axes = plt.figure().gca()
-        axes.plot(plt_data.index.values, plt_data.values, label=self.prefix + name, **kwargs)
+        axes.plot(x, y, label=self.prefix + name, **kwargs)
         axes.legend()
         if ylim is not None:
             axes.set_ylim(ylim)

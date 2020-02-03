@@ -1,7 +1,12 @@
-from sphinx.setup_command import BuildDoc
 from setuptools import setup
 
-cmdclass = {'build_sphinx': BuildDoc}
+cmdclass = {}
+
+try:
+    from sphinx.setup_command import BuildDoc
+    cmdclass['build_sphinx'] = BuildDoc
+except ImportError:
+    print("Warning: Sphinx not available, not building docs.")
 
 name = "training-logger"
 version = "0.1"
@@ -19,17 +24,21 @@ setup(
     zip_safe=False,
     cmdclass=cmdclass,
     command_options={
-        'project': ('setup.py', name),
-        'version': ('setup.py', version),
-        'release': ('setup.py', release),
-        'source_dir': ('setup.py', './doc/source'),
-        'build-dir': ('setup.py', './doc/build')
+        'build_sphinx': {
+            'project': ('setup.py', name),
+            'version': ('setup.py', version),
+            'release': ('setup.py', release),
+            'source_dir': ('setup.py', './doc/source'),
+            'build-dir': ('setup.py', './doc/build')
+        }
     },
     install_requires=(
         'pillow',
         'numpy',
         'pandas',
-        'matplotlib',
+        'matplotlib'
+    ),
+    extras_require=(
         'sphinx',
         'sphinx_rtd_theme'
     )
