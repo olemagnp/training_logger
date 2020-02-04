@@ -16,7 +16,7 @@ class TrainingLogger:
     
     DATATYPES = set({"scalar", "img"})
     
-    def __init__(self, basename, overwrite=False):
+    def __init__(self, basename, overwrite=False, save_freq=50):
         """
         Create a new logger, which logs to :code:`basename`.
         
@@ -29,6 +29,7 @@ class TrainingLogger:
         
         :param basename: The directory to save logs, metadata, and images to.
         :param overwrite: If :code:`True`, no check is made to confirm that you wish to work with existing logs.
+        :param save_freq: The number of changes that must be made before data is saved to file.
         """
         self.basename = basename
         try:
@@ -60,8 +61,16 @@ class TrainingLogger:
             self.data = pd.DataFrame()
             self.metadata = {}
         self.meta_changed = False
+        self.save_freq = save_freq
+        self.save_calls = 0
     
-    def save(self):
+    def flush(self):
+        """
+        Force write all new data to file.
+        """
+        self.save(True)
+    
+    def save(self, force=False):
         """
         Save the content of the logger.
         
@@ -69,11 +78,14 @@ class TrainingLogger:
         but only saves the metadata to :nocode:`<basename>/data.meta` if the metadata
         has changed (i.e. if a new column has been added).
         """
-        self.data.to_csv(os.path.join(self.basename, "data.csv"))
-        if self.meta_changed:
-            with open(os.path.join(self.basename, "data.meta"), "w") as f:
-                f.write(str(self.metadata))
-            self.meta_changed = False
+        self.save_calls += 1
+        if force or self.save_calls >= self.save_freq:
+            self.data.to_csv(os.path.join(self.basename, "data.csv"))
+            if self.meta_changed:
+                with open(os.path.join(self.basename, "data.meta"), "w") as f:
+                    f.write(str(self.metadata))
+                self.meta_changed = False
+            self.save_calls = 0
     
     def add_scalar(self, name, value, iteration=None):
         """
