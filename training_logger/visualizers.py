@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import re
 from collections import Iterable
 from training_logger import TrainingLogger
+from PIL import Image
 
 class LogVisualizer:
     """
