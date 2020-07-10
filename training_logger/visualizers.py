@@ -131,12 +131,12 @@ class LogVisualizer:
         """
         if not isinstance(expr, Iterable):
             expr = [expr]
+        names = []
         for ex in expr:
-            names = []
             for col_name in self.get_cols():
                 if re.fullmatch(ex, col_name):
                     names.append(col_name)
-            axes = self.show_scalars(names, False, axes, **kwargs)
+        axes = self.show_scalars(names, False, axes, **kwargs)
         return axes
     
     def show_scalars(self, names, subplots=True, axes=None, **kwargs):
@@ -152,12 +152,10 @@ class LogVisualizer:
         :param kwargs: Keyword-arguments passed to :meth:`~LogVisualizer.show_graph`
         :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         """
-        print(names)
         for name in names:
             axes = self.show_graph(name, axes, legend=subplots, **kwargs)
             if subplots:
                 axes = None
-            print(axes)
         if not subplots:
             axes.legend()
         return axes
