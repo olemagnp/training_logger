@@ -156,6 +156,7 @@ class LogVisualizer:
             axes = self.show_graph(name, axes, legend=subplots, **kwargs)
             if subplots:
                 axes = None
+            print(axes)
         if not subplots:
             axes.legend()
         return axes
