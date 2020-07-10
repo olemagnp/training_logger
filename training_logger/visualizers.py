@@ -136,6 +136,7 @@ class LogVisualizer:
             for col_name in self.get_cols():
                 if re.fullmatch(ex, col_name):
                     names.append(col_name)
+        print(names)
         axes = self.show_scalars(names, False, axes, **kwargs)
         return axes
     
