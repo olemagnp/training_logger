@@ -129,7 +129,6 @@ class LogVisualizer:
         :param kwargs: Keyword-arguments passed to :func: :meth:`~LogVisualizer.show_scalars`.
         :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         """
-        print("LOGLOGLOGLOG")
         if not isinstance(expr, Iterable):
             expr = [expr]
         names = []
@@ -137,8 +136,7 @@ class LogVisualizer:
             for col_name in self.get_cols():
                 if re.fullmatch(ex, col_name):
                     names.append(col_name)
-        print(names)
-        # axes = self.show_scalars(names, False, axes, **kwargs)
+        axes = self.show_scalars(names, False, axes, **kwargs)
         return axes
     
     def show_scalars(self, names, subplots=True, axes=None, **kwargs):
@@ -255,20 +253,8 @@ class MultiLogVisualizer:
         :param kwargs: Keyword-arguments passed to the show_graph method of internal visualizers.
         :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the final dataseries.
         """
-        if not isinstance(expr, Iterable):
-            expr = [expr]
-        for ex in expr:
-            names = set()
-            for col_name in self.get_cols():
-                if re.fullmatch(ex, col_name):
-                    names.add(col_name)
-            for viz in self.visualizers:
-                for name in names:
-                    try:
-                        axes = viz.show_graph(name, axes, **kwargs)
-                    except AssertionError:
-                        pass
-            axes = None
+        for viz in self.visualizers:
+            axes = viz.show_matching_scalars(expr, axes, **kwargs)
         return plt.gca()
         
     
