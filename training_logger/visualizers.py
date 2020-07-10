@@ -152,6 +152,7 @@ class LogVisualizer:
         :param kwargs: Keyword-arguments passed to :meth:`~LogVisualizer.show_graph`
         :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         """
+        print(names)
         for name in names:
             axes = self.show_graph(name, axes, legend=subplots, **kwargs)
             if subplots:
