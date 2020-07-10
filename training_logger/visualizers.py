@@ -46,7 +46,7 @@ class LogVisualizer:
 
         return np.convolve(to_conv, window, mode='valid')
     
-    def show_graph(self, name, axes=None, ylim=None, xlim=None, smooth_window=0, smooth_sigma=3, **kwargs):
+    def show_graph(self, name, axes=None, ylim=None, xlim=None, smooth_window=0, smooth_sigma=3, legend=True, **kwargs):
         """
         Base method to plot a scalar value.
         
@@ -74,7 +74,8 @@ class LogVisualizer:
         if axes is None:
             axes = plt.figure().gca()
         axes.plot(x, y, label=self.prefix + name, **kwargs)
-        axes.legend()
+        if legend:
+            axes.legend()
         if ylim is not None:
             axes.set_ylim(ylim)
         if xlim is not None and isinstance(xlim, Iterable):
@@ -135,7 +136,7 @@ class LogVisualizer:
             for col_name in self.get_cols():
                 if re.fullmatch(ex, col_name):
                     names.append(col_name)
-            self.show_scalars(names, False, axes, **kwargs)
+            axes = self.show_scalars(names, False, axes, **kwargs)
         return axes
     
     def show_scalars(self, names, subplots=True, axes=None, **kwargs):
@@ -152,9 +153,11 @@ class LogVisualizer:
         :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         """
         for name in names:
-            axes = self.show_graph(name, axes, **kwargs)
+            axes = self.show_graph(name, axes, legend=subplots, **kwargs)
             if subplots:
                 axes = None
+        if not subplots:
+            axes.legend()
         return axes
     
     def show_all_scalars(self, subplots=True, axes=None, **kwargs):
