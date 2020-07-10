@@ -87,7 +87,7 @@ class TrainingLogger:
                 self.meta_changed = False
             self.save_calls = 0
     
-    def insert_scalar(self, name, value, iteration=None):
+    def __insert_scalar(self, name, value, iteration=None):
         if name not in self.data.columns:
             self.data[name] = None
             self.metadata[name] = "scalar"
@@ -114,7 +114,7 @@ class TrainingLogger:
                     this, meaning you are free to save whatever you wish.
         :param iteration: Iteration to save this image to. Used for displaying the data. If None, :code:`iteration = len(self.data.index)`
         """
-        self.insert_scalar(name, value, iteration)
+        self.__insert_scalar(name, value, iteration)
         self.save()
     
     def add_image(self, name, value, iteration=None):
@@ -151,10 +151,26 @@ class TrainingLogger:
         self.save()
 
 
-    def add_scalars(**keyvals, iteration = None):
+    def add_scalars(**keyvals, pre: str = "", post: str = "", iteration = None):
+        """
+        Add multiple scalars, given as key-value pairs.
+
+        If a given scalar name does not exist yet, a new
+        column is added to the dataframe and metadata.
+        
+        The method saves the data to file after adding.
+        
+        :param keyvals: Name and values to add. Note that the values should be numbers, not Tensors or Arrays, 
+                    for them to work properly with the visualization. However, no check is made against
+                    this, meaning you are free to save whatever you wish.
+        :param pre: String to add before every name
+        :param post: String to add after every name
+        :param iteration: Iteration to save this image to. Used for displaying the data. If None, :code:`iteration = len(self.data.index)`
+        """
+        
         if iteration is None:
             iteration = len(self.data.index)
         
         for name, val in keyvals.items():
-            self.insert_scalar(name, val, iteration)
+            self.__insert_scalar(pre + name + post, val, iteration)
         self.save()
