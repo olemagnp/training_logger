@@ -87,6 +87,18 @@ class TrainingLogger:
                 self.meta_changed = False
             self.save_calls = 0
     
+    def insert_scalar(self, name, value, iteration=None):
+        if name not in self.data.columns:
+            self.data[name] = None
+            self.metadata[name] = "scalar"
+            self.meta_changed = True
+
+        assert self.metadata[name] == "scalar", f"Wrong datatype 'scalar' for column of type '{self.metadata[name]}'"
+
+        if iteration is None:
+            iteration = len(self.data.index)
+        self.data.loc[iteration, name] = value
+
     def add_scalar(self, name, value, iteration=None):
         """
         Add a scalar value to the log.
@@ -102,16 +114,7 @@ class TrainingLogger:
                     this, meaning you are free to save whatever you wish.
         :param iteration: Iteration to save this image to. Used for displaying the data. If None, :code:`iteration = len(self.data.index)`
         """
-        if name not in self.data.columns:
-            self.data[name] = None
-            self.metadata[name] = "scalar"
-            self.meta_changed = True
-
-        assert self.metadata[name] == "scalar", f"Wrong datatype 'scalar' for column of type '{self.metadata[name]}'"
-
-        if iteration is None:
-            iteration = len(self.data.index)
-        self.data.loc[iteration, name] = value
+        self.insert_scalar(name, value, iteration)
         self.save()
     
     def add_image(self, name, value, iteration=None):
@@ -148,3 +151,10 @@ class TrainingLogger:
         self.save()
 
 
+    def add_scalars(**keyvals, iteration = None):
+        if iteration is None:
+            iteration = len(self.data.index)
+        
+        for name, val in keyvals.items():
+            self.insert_scalar(name, val, iteration)
+        self.save()
