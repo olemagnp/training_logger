@@ -151,7 +151,7 @@ class TrainingLogger:
         self.save()
 
 
-    def add_scalars(pre: str = "", post: str = "", iteration = None, **keyvals):
+    def add_scalars(self, pre: str = "", post: str = "", iteration = None, **keyvals):
         """
         Add multiple scalars, given as key-value pairs.
 
