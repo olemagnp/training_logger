@@ -151,7 +151,7 @@ class TrainingLogger:
         self.save()
 
 
-    def add_scalars(**keyvals, pre: str = "", post: str = "", iteration = None):
+    def add_scalars(pre: str = "", post: str = "", iteration = None, **keyvals):
         """
         Add multiple scalars, given as key-value pairs.
 
@@ -167,7 +167,7 @@ class TrainingLogger:
         :param post: String to add after every name
         :param iteration: Iteration to save this image to. Used for displaying the data. If None, :code:`iteration = len(self.data.index)`
         """
-        
+
         if iteration is None:
             iteration = len(self.data.index)
         
