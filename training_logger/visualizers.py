@@ -101,7 +101,7 @@ class LogVisualizer:
         if axes is None:
             fig = plt.figure(figsize=(30,6))
             
-            axes = plt.axes()
+            axes = fig.gca()
         
         path = self.logger.data.loc[iteration, name]
         assert path is not None
@@ -129,6 +129,7 @@ class LogVisualizer:
         :param kwargs: Keyword-arguments passed to :func: :meth:`~LogVisualizer.show_scalars`.
         :returns: :class:`~matplotlib.axes.Axes` object, the one used to draw the plot.
         """
+        print("LOGLOGLOGLOG")
         if not isinstance(expr, Iterable):
             expr = [expr]
         names = []
@@ -137,7 +138,7 @@ class LogVisualizer:
                 if re.fullmatch(ex, col_name):
                     names.append(col_name)
         print(names)
-        axes = self.show_scalars(names, False, axes, **kwargs)
+        # axes = self.show_scalars(names, False, axes, **kwargs)
         return axes
     
     def show_scalars(self, names, subplots=True, axes=None, **kwargs):
