@@ -4,13 +4,14 @@ cmdclass = {}
 
 try:
     from sphinx.setup_command import BuildDoc
-    cmdclass['build_sphinx'] = BuildDoc
+
+    cmdclass["build_sphinx"] = BuildDoc
 except ImportError:
     print("Warning: Sphinx not available, not building docs.")
 
 name = "training-logger"
 version = "0.1"
-release = "0.1.6"
+release = "0.1.7"
 
 setup(
     name=name,
@@ -24,21 +25,14 @@ setup(
     zip_safe=False,
     cmdclass=cmdclass,
     command_options={
-        'build_sphinx': {
-            'project': ('setup.py', name),
-            'version': ('setup.py', version),
-            'release': ('setup.py', release),
-            'source_dir': ('setup.py', './doc/source'),
-            'build-dir': ('setup.py', './doc/build')
+        "build_sphinx": {
+            "project": ("setup.py", name),
+            "version": ("setup.py", version),
+            "release": ("setup.py", release),
+            "source_dir": ("setup.py", "./doc/source"),
+            "build-dir": ("setup.py", "./doc/build"),
         }
     },
-    install_requires=(
-        'pillow',
-        'numpy',
-        'pandas',
-        'matplotlib'
-    ),
-    extras_require={
-        'documentation': ['sphinx', 'sphinx_rtd_theme']
-    }
+    install_requires=("pillow", "numpy", "pandas", "matplotlib"),
+    extras_require={"documentation": ["sphinx", "sphinx_rtd_theme"]},
 )
