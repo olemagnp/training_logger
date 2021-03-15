@@ -16,7 +16,7 @@ class TrainingLogger:
     Images are saved in the root folder
     """
 
-    DATATYPES = set({"scalar", "img"})
+    DATATYPES = set({"scalar", "img", "text"})
 
     def __init__(self, basename, overwrite=False, save_freq=50):
         """
@@ -148,6 +148,21 @@ class TrainingLogger:
             iteration = len(self.data.index)
         self.data.loc[iteration, name] = value
 
+    def __insert_text(self, name, value, iteration=None):
+        name = self._get_name(name)
+        if name not in self.data.columns:
+            self.data[name] = None
+            self.metadata[name] = "text"
+            self.meta_changed = True
+
+        assert (
+            self.metadata[name] == "text"
+        ), f"Wrong datatype 'text' for column of type '{self.metadata[name]}'"
+
+        if iteration is None:
+            iteration = len(self.data.index)
+        self.data.loc[iteration, name] = value
+
     def add_scalar(self, name, value, iteration=None):
         """
         Add a scalar value to the log.
@@ -164,6 +179,24 @@ class TrainingLogger:
         :param iteration: Iteration to save this image to. Used for displaying the data. If None, :code:`iteration = len(self.data.index)`
         """
         self.__insert_scalar(name, value, iteration)
+        self.save()
+
+    def add_text(self, name, value, iteration=None):
+        """
+        Add a text value to the log.
+
+        If the given text name does not exist yet, a new
+        column is added to the dataframe and metadata.
+
+        The method saves the data to file after adding.
+
+        :param name: Name of the value, used to group and display the data.
+        :param value: Text value to add. No check is made against the type of this
+                    parameter, meaning you are free to save whatever you wish.
+        :param iteration: Iteration to save this image to. Used for displaying the data.
+                    If None, :code:`iteration = len(self.data.index)`
+        """
+        self.__insert_text(name, value, iteration)
         self.save()
 
     def add_image(self, name, value, iteration=None):
