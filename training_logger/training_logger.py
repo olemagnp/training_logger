@@ -215,8 +215,8 @@ class TrainingLogger:
         if value.dtype == np.float32:
             value = (value * 255).astype("uint8")
 
-        os.makedirs(os.path.dirname(name), exist_ok=True)
         img_path = os.path.join(self.basename, f"{name}-{iteration}.png")
+        os.makedirs(os.path.dirname(img_path), exist_ok=True)
         i = Image.fromarray(value)
         i.save(img_path)
         i.close()
