@@ -254,8 +254,8 @@ class TrainingLogger:
         """
         old_pre, old_post = self.prefix, self.postfix
 
-        self.prefix = pre
-        self.postfix = post
+        self.prefix = self.prefix + pre
+        self.postfix = self.postfix + post
 
         if iteration is None:
             iteration = len(self.data.index)
