@@ -11,7 +11,7 @@ except ImportError:
 
 name = "training-logger"
 version = "0.1"
-release = "0.1.9"
+release = "0.1.10"
 
 setup(
     name=name,

@@ -73,8 +73,8 @@ class TrainingLogger:
         self.meta_changed = False
         self.save_freq = save_freq
         self.save_calls = 0
-        self.prefix = None
-        self.postfix = None
+        self.prefix = ""
+        self.postfix = ""
 
     def flush(self):
         """
@@ -100,37 +100,25 @@ class TrainingLogger:
             self.save_calls = 0
 
     def _get_name(self, name):
-        if self.prefix is not None:
-            name = self.prefix + name
-        if self.postfix is not None:
-            name = name + self.postfix
+        name = self.prefix + name + self.postfix
         return name
 
     def add_to_prefix(self, name: Text):
-        if self.prefix is None:
-            self.prefix = name
-        else:
-            self.prefix = self.prefix + name
+        self.prefix = self.prefix + name
 
     def remove_from_prefix(self, name: Text):
         if not self.prefix.endswith(name):
             raise ValueError("Can only remove last part of prefix.")
         self.prefix = self.prefix[: -len(name)]
-        if self.prefix == "":
-            self.prefix = None
 
     def add_to_postfix(self, name: Text):
-        if self.postfix is None:
-            self.postfix = name
-        else:
-            self.postfix = self.postfix + name
+        self.postfix = self.postfix + name
 
     def remove_from_postfix(self, name: Text):
         if not self.postfix.endswith(name):
             raise ValueError("Can only remove last part of postfix.")
         self.postfix = self.postfix[: -len(name)]
-        if self.postfix == "":
-            self.postfix = None
+        self.postfix = None
 
     def __insert_scalar(self, name, value, iteration=None):
         name = self._get_name(name)
