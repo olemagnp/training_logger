@@ -216,6 +216,9 @@ class TrainingLogger:
             value = (value * 255).astype("uint8")
 
         img_path = os.path.join(self.basename, f"{name}-{iteration}.png")
+        print(name)
+        print(img_path)
+        print()
         os.makedirs(os.path.dirname(img_path), exist_ok=True)
         i = Image.fromarray(value)
         i.save(img_path)
